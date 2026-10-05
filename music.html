@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUSIC</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<main class="music-page">
+
+    <header class="music-header">
+
+        <p class="music-subtitle">
+            PERSONAL ARCHIVE / MUSIC
+        </p>
+
+        <h1>MUSIC</h1>
+
+        <div class="music-line"></div>
+
+        <p class="music-description">
+            songs for mydei & peucesta
+        </p>
+
+    </header>
+
+
+    <!-- =====================
+         曲の投稿フォーム
+    ====================== -->
+
+    <section class="music-form">
+
+        <input
+            type="text"
+            id="musicTitle"
+            placeholder="曲名"
+        >
+
+        <input
+            type="text"
+            id="musicArtist"
+            placeholder="アーティスト名"
+        >
+
+        <input
+            type="text"
+            id="musicUrl"
+            placeholder="YouTube URL"
+        >
+
+        <textarea
+            id="musicComment"
+            placeholder="この曲について……"
+        ></textarea>
+
+        <textarea
+            id="musicLyric"
+            placeholder="好きな歌詞の短い引用……"
+        ></textarea>
+
+        <textarea
+            id="musicLyricComment"
+            placeholder="この歌詞について……"
+        ></textarea>
+
+        <button type="button" onclick="addMusic()">
+            POST MUSIC
+        </button>
+
+    </section>
+
+
+    <!-- =====================
+         曲一覧
+    ====================== -->
+
+    <section id="musicList" class="music-list">
+    </section>
+
+
+    <!-- 下部リンク -->
+
+    <nav class="music-links">
+
+        <a href="index.html">TOP</a>
+
+        <a href="about.html">ABOUT</a>
+
+        <a href="text.html">NOVEL</a>
+
+        <a href="illustration.html">ILLUSTRATION</a>
+
+        <a href="other.html">OTHER</a>
+
+    </nav>
+
+</main>
+
+
+<script>
+
+/* =========================
+   YouTube IDを取得
+========================= */
+
+function getYoutubeId(url) {
+
+    const match = url.match(
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/
+    );
+
+    if (match) {
+        return match[1];
+    }
+
+    return "";
+}
+
+
+/* =========================
+   曲を追加
+========================= */
+
+function addMusic() {
+
+    const title =
+        document.getElementById("musicTitle").value.trim();
+
+    const artist =
+        document.getElementById("musicArtist").value.trim();
+
+    const url =
+        document.getElementById("musicUrl").value.trim();
+
+    const comment =
+        document.getElementById("musicComment").value.trim();
+
+    const lyric =
+        document.getElementById("musicLyric").value.trim();
+
+    const lyricComment =
+        document.getElementById("musicLyricComment").value.trim();
+
+
+    // 曲名とURLがない場合は投稿しない
+
+    if (title === "" || url === "") {
+        return;
+    }
+
+
+    const youtubeId = getYoutubeId(url);
+
+
+    const musics =
+        JSON.parse(localStorage.getItem("myMusic")) || [];
+
+
+    musics.unshift({
+
+        title: title,
+
+        artist: artist,
+
+        url: url,
+
+        youtubeId: youtubeId,
+
+        comment: comment,
+
+        lyric: lyric,
+
+        lyricComment: lyricComment
+
+    });
+
+
+    localStorage.setItem(
+        "myMusic",
+        JSON.stringify(musics)
+    );
+
+
+    // 入力欄を空にする
+
+    document.getElementById("musicTitle").value = "";
+
+    document.getElementById("musicArtist").value = "";
+
+    document.getElementById("musicUrl").value = "";
+
+    document.getElementById("musicComment").value = "";
+
+    document.getElementById("musicLyric").value = "";
+
+    document.getElementById("musicLyricComment").value = "";
+
+
+    displayMusic();
+
+}
+
+
+/* =========================
+   曲を表示
+========================= */
+
+function displayMusic() {
+
+    const list =
+        document.getElementById("musicList");
+
+
+    const musics =
+        JSON.parse(localStorage.getItem("myMusic")) || [];
+
+
+    list.innerHTML = "";
+
+
+    musics.forEach((music, index) => {
+
+        const article =
+            document.createElement("article");
+
+        article.className = "music-entry";
+
+
+        const number =
+            String(musics.length - index).padStart(3, "0");
+
+
+        let cover = "";
+
+
+        if (music.youtubeId) {
+
+            cover = `
+                <a
+                    class="music-cover"
+                    href="${music.url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+
+                    <img
+                        src="https://img.youtube.com/vi/${music.youtubeId}/hqdefault.jpg"
+                        alt="${music.title}"
+                    >
+
+                    <span class="music-play">
+                        LISTEN ↗
+                    </span>
+
+                </a>
+            `;
+
+        }
+
+
+        article.innerHTML = `
+
+            <p class="music-number">
+                MUSIC / ${number}
+            </p>
+
+            ${cover}
+
+            <div class="music-details">
+
+                <p class="music-category">
+                    IMAGE SONG
+                </p>
+
+                <h2>
+                    ${music.title}
+                </h2>
+
+                <p class="music-artist">
+                    ${music.artist}
+                </p>
+
+                <p class="music-impression">
+                    ${music.comment.replace(/\n/g, "<br>")}
+                </p>
+
+
+                ${
+                    music.lyric
+                    ? `
+                    <div class="lyric-box">
+
+                        <p class="lyric-label">
+                            LYRIC / QUOTE
+                        </p>
+
+                        <blockquote class="lyric-quote">
+                            ${music.lyric.replace(/\n/g, "<br>")}
+                        </blockquote>
+
+                        <p class="lyric-comment">
+                            ${music.lyricComment.replace(/\n/g, "<br>")}
+                        </p>
+
+                    </div>
+                    `
+                    : ""
+                }
+
+
+                <a
+                    class="music-listen"
+                    href="${music.url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    WATCH ON YOUTUBE ↗
+                </a>
+
+	<button
+            class="music-delete"
+            onclick="deleteMusic(${index})">
+            DELETE
+        </button>
+
+            </div>
+
+        `;
+
+
+        list.appendChild(article);
+
+    });
+
+}
+
+
+/* 曲を削除 */
+
+function deleteMusic(index) {
+
+    const musics =
+        JSON.parse(localStorage.getItem("myMusic")) || [];
+
+    musics.splice(index, 1);
+
+    localStorage.setItem(
+        "myMusic",
+        JSON.stringify(musics)
+    );
+
+    displayMusic();
+}
+
+
+
+/* ページを開いたとき */
+
+displayMusic();
+
+</script>
+
+</body>
+</html>
