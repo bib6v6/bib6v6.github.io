@@ -1758,6 +1758,43 @@ body:hover .menu {
         margin-top: 75px;
     }
 
+   .global-menu {
+    position: fixed;
+
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+
+    padding: 24px 20px;
+
+    display: flex;
+    justify-content: center;
+
+    gap: 40px;
+
+    background: rgba(55, 18, 12, 0.92);
+
+    z-index: 100;
+}
+
+.global-menu a {
+    color: #f8eee8;
+
+    text-decoration: none;
+
+    font-size: 11px;
+
+    letter-spacing: 0.15em;
+
+    opacity: 0.7;
+
+    transition: opacity 0.2s ease;
+}
+
+.global-menu a:hover {
+    opacity: 1;
+}
 
     /* -------------------------
        MUSIC
